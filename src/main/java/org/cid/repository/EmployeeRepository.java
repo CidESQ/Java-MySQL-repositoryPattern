@@ -56,36 +56,26 @@ public class EmployeeRepository implements IRepository<Employee> {
     @Override
     public void save(Employee employee) throws SQLException {
 
-        String sqlInsert = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary) " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-        String sqlUpdate = "UPDATE employees set first_name = ?, pa_surname = ?, ma_surname = ?, email = ?, salary = ?" +
-                " WHERE id = ?";
-
-        // Actualizacion
+        String query;
+        //? Update employee
         if (employee.getId() > 0 && employee.getId() != null){
-            try(
-                    PreparedStatement myPreparedStatement = myConnection.prepareStatement(sqlUpdate);
-            ){
-                myPreparedStatement.setString(1, employee.getFirstName());
-                myPreparedStatement.setString(2, employee.getPaSurname());
-                myPreparedStatement.setString(3, employee.getMaSurname());
-                myPreparedStatement.setString(4, employee.getEmail());
-                myPreparedStatement.setFloat(5, employee.getSalary());
-                myPreparedStatement.setInt(6, employee.getId());
-                myPreparedStatement.executeUpdate();
-            }
-        }else {
-            try(
-                    PreparedStatement myPreparedStatement = myConnection.prepareStatement(sqlInsert);
-            ){
-                myPreparedStatement.setString(1, employee.getFirstName());
-                myPreparedStatement.setString(2, employee.getPaSurname());
-                myPreparedStatement.setString(3, employee.getMaSurname());
-                myPreparedStatement.setString(4, employee.getEmail());
-                myPreparedStatement.setFloat(5, employee.getSalary());
-                myPreparedStatement.executeUpdate();
-            }
+            query = "UPDATE employees set first_name = ?, pa_surname = ?, ma_surname = ?, email = ?, salary = ?, curp = ?" +
+                " WHERE id = ?";
+        }else{ //? Insert employee
+            query = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary, curp) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+        }
+
+        try (PreparedStatement myPreparedStatement = myConnection.prepareStatement(query)) {
+            myPreparedStatement.setString(1, employee.getFirstName());
+            myPreparedStatement.setString(2, employee.getPaSurname());
+            myPreparedStatement.setString(3, employee.getMaSurname());
+            myPreparedStatement.setString(4, employee.getEmail());
+            myPreparedStatement.setFloat(5, employee.getSalary());
+            myPreparedStatement.setString(6, employee.getCurp());
+            if (employee.getId() > 0 && employee.getId() != null)
+                    myPreparedStatement.setInt(7, employee.getId());
+            myPreparedStatement.executeUpdate();
         }
     }
 
@@ -108,6 +98,7 @@ public class EmployeeRepository implements IRepository<Employee> {
         employee.setMaSurname(myResulset.getString("ma_surname"));
         employee.setEmail(myResulset.getString("email"));
         employee.setSalary(myResulset.getFloat("salary"));
+        employee.setCurp(myResulset.getString("curp"));
         return employee;
     }
 }

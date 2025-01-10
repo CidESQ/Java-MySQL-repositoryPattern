@@ -13,16 +13,19 @@ public class Main {
     public static void main(String[] args) throws SQLException {
 
         try(Connection connection = DatabaseConnection.getInstance()){
-
-            IRepository<Employee> repository = new EmployeeRepository();
+//TODO: Check connexion
+            IRepository<Employee> repository = new EmployeeRepository(connection);
 
             System.out.println("---------Listando empleados----------");
             repository.findAll().forEach(System.out::println);
             System.out.println("-------------------------------------");
 
-            repository.delete(8);
-            System.out.println("Empleado eliminado");
+//            repository.delete(7);
+//            System.out.println("Empleado eliminado");
 
+            repository.save(new Employee( "Cid", "Esquivel", "Gonzalez", "cid@mail.com", 19291f, "adsasd"));
+
+            System.out.println("Empleado creado");
             System.out.println("---------Listando empleados----------");
             repository.findAll().forEach(System.out::println);
             System.out.println("-------------------------------------");
