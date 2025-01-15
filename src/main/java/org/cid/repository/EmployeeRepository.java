@@ -13,10 +13,8 @@ public class EmployeeRepository implements IRepository<Employee> {
 //        return DatabaseConnection.getInstance();
 //    }
 
-    private Connection myConnection;
-
-    public EmployeeRepository(Connection myConnection) {
-        this.myConnection = myConnection;
+    private Connection getConnection() throws SQLException {
+        return DatabaseConnection.getConnection();
     }
 
     @Override
@@ -24,9 +22,10 @@ public class EmployeeRepository implements IRepository<Employee> {
         List<Employee> employees = new ArrayList<>();
 
         try(
+            Connection myConnection = getConnection();
             Statement myStatement = myConnection.createStatement();
             ResultSet myResulset = myStatement.executeQuery("SELECT * FROM employees");
-            ) {
+        ) {
             while (myResulset.next()){
                 employees.add(createEmployee(myResulset));
             }
@@ -40,7 +39,10 @@ public class EmployeeRepository implements IRepository<Employee> {
 
         Employee employee = null;
 
-        try(PreparedStatement myStatement = myConnection.prepareStatement("SELECT * FROM employees WHERE id=?")) {
+        try(
+            Connection myConnection = getConnection();
+            PreparedStatement myStatement = myConnection.prepareStatement("SELECT * FROM employees WHERE id=?")
+        ) {
             myStatement.setInt(1, id);
             try(
                     ResultSet myResulset = myStatement.executeQuery();
@@ -66,7 +68,10 @@ public class EmployeeRepository implements IRepository<Employee> {
                     "VALUES (?, ?, ?, ?, ?, ?)";
         }
 
-        try (PreparedStatement myPreparedStatement = myConnection.prepareStatement(query)) {
+        try (
+            Connection myConnection = getConnection();
+            PreparedStatement myPreparedStatement = myConnection.prepareStatement(query)
+        ) {
             myPreparedStatement.setString(1, employee.getFirstName());
             myPreparedStatement.setString(2, employee.getPaSurname());
             myPreparedStatement.setString(3, employee.getMaSurname());
@@ -83,8 +88,9 @@ public class EmployeeRepository implements IRepository<Employee> {
     public void delete(Integer id) throws SQLException {
 
         try(
-                PreparedStatement myPreparedStatement = myConnection.prepareStatement("DELETE FROM employees WHERE id=?");
-                ){
+            Connection myConnection = getConnection();
+            PreparedStatement myPreparedStatement = myConnection.prepareStatement("DELETE FROM employees WHERE id=?");
+        ){
             myPreparedStatement.setInt(1, id);
             myPreparedStatement.executeUpdate();
         }

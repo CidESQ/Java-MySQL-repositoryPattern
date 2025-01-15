@@ -2,6 +2,8 @@ package org.cid.util;
 
 // Singleton: Garantiza que solo exista una instancia de conexion en todo el programa se accede desde el metodo ESTATICO
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
 import java.sql.*;
 
 public class DatabaseConnection {
@@ -10,12 +12,28 @@ public class DatabaseConnection {
     private static final String user = "cidesgon";
     private static final String pass = "Emmanuel";
 
-    private static Connection myConnection;
+    private static BasicDataSource pool;
 
-    public static Connection getInstance() throws SQLException {
-        if (myConnection == null){
-            myConnection = DriverManager.getConnection(url, user, pass);
+    public static BasicDataSource getInstance() throws SQLException {
+        if (pool == null){
+            pool = new BasicDataSource();
+            // log pool
+            pool.setUrl(url);
+            pool.setUsername(user);
+            pool.setPassword(pass);
+
+            //Config pool
+            pool.setInitialSize(3);
+            pool.setMinIdle(3);
+            pool.setMaxIdle(10);
+            pool.setMaxTotal(10);
+
         }
-        return myConnection;
+        return pool;
+    }
+
+    //Metodo para obtener solo una conexion del pool
+    public static Connection getConnection () throws SQLException {
+        return getInstance().getConnection();
     }
 }

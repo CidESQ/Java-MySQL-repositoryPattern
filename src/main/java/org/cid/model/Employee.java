@@ -11,6 +11,7 @@ public class Employee {
     private String curp;
 
     public Employee() {
+        this.id = 0;
     }
 
     public Employee( String firstName, String paSurname, String maSurname, String email, Float salary, String curp) {
